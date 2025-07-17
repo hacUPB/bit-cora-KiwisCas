@@ -26,7 +26,86 @@ Este lenguaje necesita se traducido a lenguaje máquina mediante un programa lla
 
 ## ¿Qué es lenguaje de máquina?
 
-Es el languaje de programación que entiende directamente la máquina, su sistema está conformado por un sistema binario
+Es el languaje de programación que entiende directamente la máquina, son instrucciones en código binario que se ejecutan directamente por la CPU de la computadora, es un sistema compuesto por una secuencia de bits (ceros y unos) a modo de instrucción las cuales indican a la CPU que operación debe realizar y sobre que registos, datos o memoria debe actuar.
+
+es el lenguaje de programación más bajo, osea el más cercano al hardware en la jerarquía de los lenguajes de programación y es específico de la arquitectura del procesador, osea que el lenguaje de máquina de un tipo de CPU no es necesariamente igual a otro.
+
+# Actividad 3
+
+## ¿Qué son PC, D y A?
+
+PC (Program Counter) es un registro especial de la CPU que se encarga de almacenar la dirección de la siguiente instrucción que debe de ejecutarse desde la ROM, este se incrementa de forma automática despues de realizar una instrucción, con la excepción de que la instrucción indique saltos.
+
+D (Data Register) se encarga de almacenar valores temporales que puede utilizar la ALU para realizar cálculos, D puede cargarse directamente con un número, puede copiar desde la memoria y recibir resultados de operaciones.
+
+A (Address Register) es el registro de direcciones, aunque también puede comportarse como un segundo registro de datos, se puede usar para guardar una dirección de memoria que se quiere leer o escribir y se usa también para contener valores para operaciones, por ejemplo constantes
+
+## ¿Para qué los usa la CPU?
+
+"PC" ayuda a llevar el control de que instrucción es la que debe de ejecutarse, esta se actualiza de forma automática o mediante instrucciones de salto, "A" ayuda a señalar la dirección en la memoria RAM para operaciones de lectura y(o) escritura, este tambien puede actuar como un espacio de almacenamiento temporal dentro de la CPU para guardar cualquier valor necesario en un momento dado (numeros, datos, constantes, etc.) y "D" se encarga de almacenar valores intermedios o resultados de operaciones, este es uno de los registros que utiliza directamente la ALU.
+
+# Actividad 4
+
+## Ejercicio
+
+Considera el siguiente fragmento de código en lenguaje ensamblador:
+
+```bash
+@16384
+D = A
+@16
+M = D
+```
+
+El resultado de este programa es que guarda en la posición 16 de la RAM el valor 16384. Ahora escribe un programa en lenguaje ensamblador que guarde en la posición 32 de la RAM un 100.
+
+## Desarrollo
+
+La mejor solución que pude encontrar fue la siguiente y siguiendo el ejemplo anterior:
+
+```bash
+@100
+D = A
+@32
+M = D
+``` 
+
+### Nota 
+
+Esto en más para mi facilidad y entendimiento para cuando se tenga que programar en ensambler :D
+
+*A* es la posición que se escribió anteriormente, por ejemplo:
+
+```bash 
+@50
+A = 50
+#En el momento que se escribe el @50 *A* es igual a la posición del valor numérico que hay despues del arroba, en este caso 50
+```
+
+*D* Es una forma de guardar temporalmente los datos en una variable que se puede usar más adelante, pero segun tengo entendido, no puede almacenar más de uno a la vez
+
+```bash
+# si digo 
+@50
+D = A
+D = 5O
+#En este ejemplo, D va a guardar de forma temporal el valor que se encuentra en A, osea, 50
+ ```
+
+ Finalmente *M* va a guardar EN LA POSICIÓN QUE SE ENCUENTRE EL PROGRAMA EN ESE MOMENTO un valor que se le asigne desde D y este va a quedar en la RAM
+
+```bash
+@100
+D = A
+@32
+M = D
+#Tomando de ejemplo el ejercicio, al final cuando M = D quiere decir que en la posición que se encuentra en ese momento por el @ Va a guardar el dato que estaba almacenado en D para escribirlo en la RAM
+``` 
+
+
+# Actividad 5
+
+*En caso de notas futuras las dejaré acá :D*
 
 
 
