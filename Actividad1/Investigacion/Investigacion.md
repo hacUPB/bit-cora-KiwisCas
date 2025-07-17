@@ -111,6 +111,19 @@ M = D
 
 
 
+## NOTAS 2
+
+### POR SI ACASO :CCCCC
+
+D;JGT "si D > 0 Salta"
+D;JGE "Si D => 0 Salta"
+D;JLT "Si D < 0 Salta"
+D;JLE "Si D =< 0 Salta"
+D;JEQ "Si D = 0 Salta"
+D;JNE "Si D != 0 Salta"
+0;JMP "Salta"
+
+
 
 
 
