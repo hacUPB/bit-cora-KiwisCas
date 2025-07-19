@@ -1,4 +1,4 @@
-# Actividad 1
+#  <span style ="color:orange"> Actividad 1 </span>
 ## ¿Qué es un computador Digital Moderno? 
 
 Es una máquina electronica capaz de procesar información mediante una serie de instrucciones programadas las cuales se encuentran almacenados en su memoria (ROM) y este mismo puede ejecutar una gran cantidad de programas y tareas haciendo uso del mismo hardware
@@ -12,7 +12,7 @@ luego de esto podemos seguir con los dispositivos de almacenamiento (RAM Y ROM).
 
 Finalmente encontramos los dispositivos de entrada (Teclado, mouse, sensores, microfonos, etc.) los cuales son los encargados de escribir las instrucciones de ejecución del programa y los dispositivos de salida (Pantalla, Impresora, Parlantes, etc) que muestran los resultados de salida de la ejecución del programa.
 
-# Actividad 2
+# <span style ="color:orange"> Actividad 2 </span>
 
 ## ¿Qué es entonces un programa?
 
@@ -30,7 +30,7 @@ Es el languaje de programación que entiende directamente la máquina, son instr
 
 es el lenguaje de programación más bajo, osea el más cercano al hardware en la jerarquía de los lenguajes de programación y es específico de la arquitectura del procesador, osea que el lenguaje de máquina de un tipo de CPU no es necesariamente igual a otro.
 
-# Actividad 3
+# <span style ="color:orange"> Actividad 3 </span>
 
 ## ¿Qué son PC, D y A?
 
@@ -44,7 +44,7 @@ A (Address Register) es el registro de direcciones, aunque también puede compor
 
 "PC" ayuda a llevar el control de que instrucción es la que debe de ejecutarse, esta se actualiza de forma automática o mediante instrucciones de salto, "A" ayuda a señalar la dirección en la memoria RAM para operaciones de lectura y(o) escritura, este tambien puede actuar como un espacio de almacenamiento temporal dentro de la CPU para guardar cualquier valor necesario en un momento dado (numeros, datos, constantes, etc.) y "D" se encarga de almacenar valores intermedios o resultados de operaciones, este es uno de los registros que utiliza directamente la ALU.
 
-# Actividad 4
+# <span style ="color:orange"> Actividad 4 </span>
 
 ## Ejercicio
 
@@ -52,12 +52,12 @@ Considera el siguiente fragmento de código en lenguaje ensamblador:
 
 ```bash
 @16384
-D = A
+D=A
 @16
-M = D
+M=D
 ```
 
-El resultado de este programa es que guarda en la posición 16 de la RAM el valor 16384. Ahora escribe un programa en lenguaje ensamblador que guarde en la posición 32 de la RAM un 100.
+El resultado de este programa es que guarda en la posición 16 de la RAM el valor 16384. *Ahora escribe un programa en lenguaje ensamblador que guarde en la posición 32 de la RAM un 100.*
 
 ## Desarrollo
 
@@ -65,18 +65,22 @@ La mejor solución que pude encontrar fue la siguiente y siguiendo el ejemplo an
 
 ```bash
 @100
-D = A
+D=A
 @32
-M = D
+M=D
 ``` 
+
+Realizando el ejercicio en la página [NAND2TETRIS](https://nand2tetris.github.io/web-ide/cpu/) la página arrojó el siguiente resultado
+
+![alt text](<Capturas/Captura de pantalla 2025-07-18 230502.png>)
 
 ### Nota 
 
-Esto en más para mi facilidad y entendimiento para cuando se tenga que programar en ensambler :D
+> Esto en más para mi facilidad y entendimiento para cuando se tenga que programar en ensambler :D
 
 *A* es la posición que se escribió anteriormente, por ejemplo:
 
-```bash 
+```bash
 @50
 A = 50
 #En el momento que se escribe el @50 *A* es igual a la posición del valor numérico que hay despues del arroba, en este caso 50
@@ -103,25 +107,119 @@ M = D
 ``` 
 
 
-# Actividad 5
+# <span style ="color:orange"> Actividad 5
 
-*En caso de notas futuras las dejaré acá :D*
+## Capítulo 4: Lenguaje de Máquina
 
+## ¿Qué es el lenguaje de máquina?
 
+Es el lenguaje que entiende directamente la CPU. Está compuesto por instrucciones binarias que indican operaciones específicas como cálculos, saltos, acceso a memoria o almacenamiento de datos. Es el lenguaje más bajo en la jerarquía de programación, justo donde el software se convierte en hardware.
 
+## ¿Cómo funciona la arquitectura Hack?
+
+La máquina Hack es una computadora de 16 bits con arquitectura tipo **von Neumann**, separando memorias de datos e instrucciones. Tiene:
+
+- Un registro **A** que puede guardar direcciones o valores constantes.
+- Un registro **D** que se usa como almacenamiento temporal para datos.
+- Un pseudo-registro **M** que representa el valor en la memoria apuntada por A (`M = RAM[A]`).
+
+## ¿Cómo son las instrucciones?
+
+### A-Instructions
+Sirven para cargar un valor numérico o simbólico en el registro A.
+
+```asm
+@100     // A = 100
+@LABEL   // A = dirección de la etiqueta LABEL
+```
+
+### C-Instructions
+Sirven para hacer operaciones con la ALU, guardar resultados y/o realizar saltos.
+
+```asm
+D=M      // D = RAM[A]
+D=D+M    // D = D + RAM[A]
+0;JMP    // Salto incondicional
+D;JEQ    // Salta si D == 0
+```
+
+## ¿Cómo se accede a memoria?
+
+- **Directo**: se usa una dirección literal
+```asm
+@16
+M=1
+```
+- **Inmediato**: el valor se carga directamente
+```asm
+@100
+D=A
+```
+- **Indirecto (tipo puntero)**:
+```asm
+@foo
+D=M       // Valor base del arreglo
+@i
+D=D+M     // foo[i]
+@temp
+M=D       // temp guarda la dirección final
+@temp
+A=M
+D=M       // Lee el valor de foo[i]
+```
+
+## ¿Cómo se hacen ciclos y saltos?
+
+Se usan etiquetas `(LOOP)` y comandos de salto como `JMP`, `JEQ`, `JLT`, etc.
+
+```asm
+(LOOP)
+@i
+D=M
+@100
+D=D-A
+@END
+D;JGT     // Si i > 100, salta a END
+@LOOP
+0;JMP     // Vuelve al inicio del ciclo
+(END)
+```
+
+## Entrada y Salida
+
+- La pantalla está en RAM desde la dirección `16384` (`@SCREEN`).
+- El teclado está en `24576` (`@KBD`).
+
+### Ejemplo: Dibujar un píxel negro
+```asm
+@SCREEN
+M=1       // Pinta el primer píxel
+```
+
+### Leer teclado
+```asm
+@KBD
+D=M       // D contiene el código de la tecla o 0 si no hay ninguna
+```
 
 
 ## NOTAS 2
 
 ### POR SI ACASO :CCCCC
 
-D;JGT "si D > 0 Salta"
-D;JGE "Si D => 0 Salta"
-D;JLT "Si D < 0 Salta"
-D;JLE "Si D =< 0 Salta"
-D;JEQ "Si D = 0 Salta"
-D;JNE "Si D != 0 Salta"
-0;JMP "Salta"
+1. <span style="color:green">D;JGT "si D > 0 Salta"</span>
+
+2. <span style="color:green">D;JGE "Si D => 0 Salta"</span>
+
+3. <span style="color:green">D;JLT "Si D < 0 Salta"</span>
+
+4. <span style="color:green">D;JLE "Si D =< 0 Salta"</span>
+
+5. <span style="color:green">D;JEQ "Si D = 0 Salta"</span>
+
+6. <span style="color:green">D;JNE "Si D != 0 Salta"</span>
+
+7. <span style="color:green">0;JMP "Salta"</span>
 
 
 

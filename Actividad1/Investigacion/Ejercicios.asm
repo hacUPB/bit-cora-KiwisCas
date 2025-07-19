@@ -22,7 +22,7 @@ D=A
 @1
 M=D
 
-//Primeramente se alojan los valores, hay que ser especcificos, sin afán
+//Primeramente se alojan los valores, hay que ser especificos, sin afán
 
 @0
 D=M
