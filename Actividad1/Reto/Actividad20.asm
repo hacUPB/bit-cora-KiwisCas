@@ -1,13 +1,15 @@
 
+//Actividad20
+
 (WAITD)
-  @KBD
-  D=M
-  @100
-  D=D-A
-  @DRAW
-  D;JEQ
-  @WAITD
-  0;JMP
+	@KBD
+	D=M
+	@100
+	D=D-A
+	@DRAW
+	D;JEQ
+	@WAITD
+	0;JMP
 
 (DRAW)
 	@SCREEN

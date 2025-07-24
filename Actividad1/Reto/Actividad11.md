@@ -1,6 +1,6 @@
 # Ejercicio 11
 
-## Programa dado
+## Programa dado en assembler
 
 ```asm
 @1000
