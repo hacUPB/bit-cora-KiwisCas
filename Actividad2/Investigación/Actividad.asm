@@ -1,74 +1,70 @@
+// Programa que muestra una imagen si se presiona 'd'
+// y borra la pantalla si no se presiona nada
 
-(WAITD)
+// Inicio del ciclo principal
+(LOOP)
     @KBD
-    M=D
-    @100
+    D=M         // Leer el teclado
+
+    @100        // ASCII de 'd'
     D=D-A
-    @DRAW
-    D;JEQ
-    @WAITD
-    0;JMP
-(DRAW)
+    @SHOW
+    D;JEQ       // Si D == 0, saltar a mostrar imagen
 
     @KBD
+    D=M
+    @0
+    D=D-A
+    @CLEAR
+    D;JEQ       // Si no se presiona nada, borrar pantalla
+
+    @LOOP
+    0;JMP       // Volver al inicio del ciclo
+
+// Subrutina para mostrar la imagen
+(SHOW)
+    @RETURN_SHOW
     D=A
-    @loop
+    @R13
+    M=D
+    @DRAW
+    0;JMP
 
+(RETURN_SHOW)
+    @LOOP
+    0;JMP
+
+// Subrutina para borrar la pantalla
+(CLEAR)
     @SCREEN
+    D=A
+    @R0
+    M=D          // R0 almacena la dirección actual de la pantalla
 
+(CLEAR_LOOP)
+    @R0
+    A=M
+    M=0          // Borrar pixel
 
+    @R0
+    D=M
+    @24576
+    D=D-A
+    @END_CLEAR
+    D;JEQ        // Si llegamos al final de la memoria de pantalla
 
+    @R0
+    M=M+1
+    @CLEAR_LOOP
+    0;JMP
 
+(END_CLEAR)
+    @LOOP
+    0;JMP
 
-
-
-
-@16384 
-D=A 
-@16 
-M=D
-@24576
-D=M
-@19
-D;JNE
-@16
-D=M
-@16384
-D=D-A
-@4 
-D;JLE 
-@16 
-AM=M-1 
-M=0 
-@4 
-0;JMP 
-@16 
-D=M 
-@24576 
-D=D-A 
-@4 
-D;JGE 
-@16 
-A=M 
-M=-1 
-@16 
-M=M+1 
-@4 
-0;JMP 
-
-
-(WAITD)
-	@KBD
-	D=M
-	@100
-	D=D-A
-	@DRAW
-	D;JEQ
-	@WAITD
-	0;JMP
-
+// Subrutina DRAW: tu imagen (copiada aquí directamente)
 (DRAW)
-	@SCREEN
+@SCREEN
 	D=A
 	@R12
 	AD=D+M
@@ -376,4 +372,3 @@ M=M+1
 	@R13
 	A=M
 	D;JMP
-
