@@ -1,0 +1,379 @@
+
+(WAITD)
+    @KBD
+    M=D
+    @100
+    D=D-A
+    @DRAW
+    D;JEQ
+    @WAITD
+    0;JMP
+(DRAW)
+
+    @KBD
+    D=A
+    @loop
+
+    @SCREEN
+
+
+
+
+
+
+
+
+@16384 
+D=A 
+@16 
+M=D
+@24576
+D=M
+@19
+D;JNE
+@16
+D=M
+@16384
+D=D-A
+@4 
+D;JLE 
+@16 
+AM=M-1 
+M=0 
+@4 
+0;JMP 
+@16 
+D=M 
+@24576 
+D=D-A 
+@4 
+D;JGE 
+@16 
+A=M 
+M=-1 
+@16 
+M=M+1 
+@4 
+0;JMP 
+
+
+(WAITD)
+	@KBD
+	D=M
+	@100
+	D=D-A
+	@DRAW
+	D;JEQ
+	@WAITD
+	0;JMP
+
+(DRAW)
+	@SCREEN
+	D=A
+	@R12
+	AD=D+M
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@2016 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@7704 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@15900 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@31758 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@31206 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@31759 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@19471 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@1037 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@1561 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@20473 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@28685 
+	D=D+A 
+	A=D-A 
+	M=A-D 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@29262 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@8772 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@8196 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@4104 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	@4080 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	D=A 
+	@30
+	AD=D+A
+	M=0
+	AD=A+1 
+	M=0
+	AD=A+1 
+	M=0
+	@R13
+	A=M
+	D;JMP
+
