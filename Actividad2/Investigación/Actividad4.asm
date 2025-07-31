@@ -1,70 +1,62 @@
-// Programa que muestra una imagen si se presiona 'd'
-// y borra la pantalla si no se presiona nada
-
-// Inicio del ciclo principal
-(LOOP)
-    @KBD
-    D=M         // Leer el teclado
-
-    @100        // ASCII de 'd'
-    D=D-A
-    @SHOW
-    D;JEQ       // Si D == 0, saltar a mostrar imagen
-
+(WAITD)
     @KBD
     D=M
-    @0
+    @WAITD
+    D;JEQ            // Si no hay tecla, seguir esperando
+
+    @R3
+    M=D              // Guardar el valor de la tecla presionada en R3
+
+    @R3
+    D=M
+    @100
+    D=D-A
+    @DRAW
+    D;JEQ            // Si tecla == 'd', ir a dibujar
+
+    @R3
+    D=M
+    @101
     D=D-A
     @CLEAR
-    D;JEQ       // Si no se presiona nada, borrar pantalla
+    D;JEQ            // Si tecla == 'e', ir a borrar
 
-    @LOOP
-    0;JMP       // Volver al inicio del ciclo
-
-// Subrutina para mostrar la imagen
-(SHOW)
-    @RETURN_SHOW
-    D=A
-    @R13
-    M=D
-    @DRAW
+    @WAITD
     0;JMP
 
-(RETURN_SHOW)
-    @LOOP
-    0;JMP
-
-// Subrutina para borrar la pantalla
 (CLEAR)
     @SCREEN
     D=A
     @R0
-    M=D          // R0 almacena la dirección actual de la pantalla
+    M=D          // R0 = dirección inicial de pantalla
+
+    @8192
+    D=A
+    @R1
+    M=D          // R1 = número de celdas a borrar
 
 (CLEAR_LOOP)
+    @R1
+    D=M
+    @WAITD
+    D;JEQ        // Si ya se borró todo, volver a esperar
+
     @R0
     A=M
     M=0          // Borrar pixel
 
     @R0
-    D=M
-    @24576
-    D=D-A
-    @END_CLEAR
-    D;JEQ        // Si llegamos al final de la memoria de pantalla
+    M=M+1        // R0++
 
-    @R0
-    M=M+1
+    @R1
+    M=M-1        // R1--
+
     @CLEAR_LOOP
     0;JMP
 
-(END_CLEAR)
-    @LOOP
-    0;JMP
 
-// Subrutina DRAW: tu imagen (copiada aquí directamente)
 (DRAW)
-@SCREEN
+	@SCREEN
 	D=A
 	@R12
 	AD=D+M
@@ -372,3 +364,6 @@
 	@R13
 	A=M
 	D;JMP
+
+	 @WAITD
+    0;JMP
