@@ -355,5 +355,5 @@
 	A=M
 	D;JMP
 
-	 @WAITD
+	@WAITD
     0;JMP
