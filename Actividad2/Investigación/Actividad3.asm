@@ -1,49 +1,45 @@
-// Espera y decide si dibujar o borrar
 (WAITD)
     @KBD
-    D=M          // Leer teclado
-    @CLEAR       // Si D == 0 (ninguna tecla), borrar imagen
-    D;JEQ
+    D=M         // Lee el teclado. D = valor ASCII de la tecla presionada.
+    @CLEAR       
+    D;JEQ		// Si D == 0, no hay tecla -> salta a CLEAR para borrar pantalla
+    @100        
+    D=D-A		// D = D - 100 -> compara si es la tecla 'd'
+    @DRAW       
+    D;JEQ		// Si D == 0, entonces era 'd' -> salta a DRAW para pintar
 
-    @100         // ASCII de 'd'
-    D=D-A
-    @DRAW        // Si D == 0 → es 'd'
-    D;JEQ
-
-    @WAITD       // Otra tecla → esperar de nuevo
-    0;JMP
+    @WAITD      
+    0;JMP		// Si es otra tecla -> vuelve a empezar y sigue esperando
 
 (CLEAR)
     @SCREEN
     D=A
     @R0
-    M=D          // R0 = dirección inicial SCREEN
+    M=D          // Guarda en R0 la dirección inicial de pantalla (16384)
 
     @8192
     D=A
     @R1
-    M=D          // R1 = cantidad de celdas a borrar
+    M=D          // R1 = 8192 -> cantidad de posiciones a limpiar (pantalla completa)
 
 (CLEAR_LOOP)
     @R1
     D=M
     @WAITD
-    D;JEQ        // Si R1 == 0 → volver a esperar
+    D;JEQ        // Si contador llega a 0 -> ya terminó -> volver a esperar
 
     @R0
     A=M
-    M=0          // Borrar pixel
+    M=0          // Borra la celda actual (pone el pixel en negro)
 
     @R0
-    M=M+1        // R0++
+    M=M+1        // Avanza a la siguiente dirección de pantalla
 
     @R1
-    M=M-1        // R1--
+    M=M-1        // Reduce el contador
 
     @CLEAR_LOOP
-    0;JMP
-
-
+    0;JMP		// Repite el bucle
 
 (DRAW)
 	@SCREEN
