@@ -46,6 +46,8 @@
 
     - Es un valor almacenado dentro de la celda de memoria que representa esa misma variable. por ejemplo en el caso de que en el código anterior en  `RAM[16]` estuviese contenido el número 42, el cóntenido dentro de la variable `j` va a ser en ese instante `42`. Cabe resaltar que el contenido cambia a medida que el programa ejecuta instrucciones por ejemplo cuando se hace `M=M+1`
 
+### RAE2
+
 
 ## ACTIVIDAD 2
 
@@ -100,3 +102,28 @@ int *p_var;
 p_var = &var;
 bis = *p_var;
 ```
+
+## Actividad 8
+
+- ¿Qué hace esto `int *pvar;`?
+
+    - Ese es el puntero, en este momento solo está referenciado pero posteriormente este se encarga de que cuando se desee enviar un valor para que se ocupe dentro de una variable, lo que este va a hacer es que va a servir de receptor para luego enviarlo.
+
+- ¿Qué hace esto `pvar = var;`?
+
+    - Lo que hace esta parte es que la posición que ocupa `var` se va a almacenar dentro de `pvar`
+
+- ¿Qué hace esto `var2 = *pvar`?
+
+    - Lo que hace esta parte es que el valor que está dentro de `var2` ser va a igualar a lo que hay dentro de `*pvar` por ejemplo si dentro de `*pvar` (el puntero) está almacenado por ejemplo `20` dentro de `var2` se va a almacenar `20`.
+
+- ¿Qué hace esto `pvar = &var3`?
+
+    - Suponiendo que antes de eso se declaró a `pvar` como un puntero, entonces lo que hace la linea de código descrit anteriormente es que `pvar` va a apuntar a la dirección de `var3` y la va a almacenar.
+
+
+## Actividad 9
+
+
+
+
