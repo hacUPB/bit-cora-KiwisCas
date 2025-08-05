@@ -1,5 +1,5 @@
 @j
-M=0
+M=1
 @sum
 M=0
 (LOOP)
@@ -8,7 +8,7 @@ M=0
     @100
     D=D-A
     @END
-    D;JEQ
+    D;JGT
     @j
     D=M
     @sum
