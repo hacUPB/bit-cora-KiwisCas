@@ -291,6 +291,99 @@ void ofApp::mousePressed(int x, int y, int button){
 ```
 
 - Cuando se hace clic, se cambia el color de las partículas a uno aleatorio.
-- ```ofRandom(255)``` genera un número entre 0 y 255
+- ```ofRandom(255)``` genera un número entre 0 y 255.
+
+
+# Actividad 4
+
+# Actividad 5
+
+En la unidad anterior introdujimos el concepto de puntero. Ahora vamos a profundizar en este concepto de manera práctica.
+
+El siguiente ejemplo se supone (en la actividad que sigue vas a corregir un error) que te permite seleccionar una esfera y moverla con el mouse.
+
+## ¿Cuál es la definición de un puntero?
+
+Un puntero es una variable que no almacena directamente un valor, sino la dirección de memoria de otro objeto o variable.
+En C++ se denota con ```*```.
+
+## ¿Dónde está el puntero?
+
+Se encuentra en la clase ```ofApp```
+
+```cpp
+
+vector<Sphere*> spheres;
+Sphere* selectedSphere;
+```
+
+- ```spheres``` es un vector de punteros -> cada elemento es un ```Sphere*```.
+
+- ```selectedSphere``` es un puntero a una Sphere.
+
+## ¿Cómo se inicializa el puntero?
+
+Se inicializa en el ```setup()```
+
+```cpp
+spheres.push_back(new Sphere(x, y, radius));
+```
+
+Aquí se crea dinámicamente un objeto ```Sphere``` en memoria con ```new``` y se guarda la dirección en el vector ```spheres```.
+
+Y también en:
+
+```cpp
+selectedSphere = nullptr;
+```
+El puntero se inicializa a ```nullptr``` (una forma de decir “no apunta a nada todavía”).
+
+## ¿Para qué se está usando el puntero?
+
+- El vector ```spheres``` guarda direcciones de las esferas creadas dinámicamente por lo que así se pueden tener muchas sin copiarlas completamente.
+
+- ```selectedSphere``` guarda un puntero a la esfera actualmente seleccionada, para poder actualizar sus coordenadas y moverla con el mouse.
+
+## ¿Qué es exactamente lo que está almacenado en el puntero?
+
+No se guarda la esfera completa sino la dirección en memoria de la esfera.
+
+Por ejemplo:
+- ```Sphere* s = new Sphere(...);```
+```s``` almacena una dirección como ```0x7ffee32c1a40```(ejemplo).
+
+- Luego, con ```s->draw()``` accedemos al objeto en esa dirección.
+
+# Actividad 6
+
+El problema que posee el código es que este permite seleccionar una esfera con clic, pero esta nunca deja de estar seleccionada y si se visualiza el código se puede ver la siguiente linea en ```update()```
+
+```cpp
+if (selectedSphere != nullptr) {
+    selectedSphere->update(ofGetMouseX(), ofGetMouseY());
+}
+```
+
+esto significa que despues de hacer clic sobre una esfera, esta se queda pegada permanentemente sobre el mouse, a veces suele funcionar que el mouse se pega a otra pero esta en su programación no está diseñada para soltarse.
+
+
+Por lo que para poder arreglar este error en ```ofApp.h``` agregamos en la clase ```ofApp``` la siguiente linea:
+
+```cpp
+void mouseReleased(int x, int y, int button);
+```
+
+y luego en ```ofApp.cpp``` llamamos la función para cuando se suelta el botón del mouse.
+
+```cpp
+void ofApp::mouseReleased(int x, int y, int button) {
+	if (button == OF_MOUSE_BUTTON_LEFT) {
+		selectedSphere = nullptr;
+	}
+}
+```
+Así el código funcionará de manera correcta.
+
+
 
 
