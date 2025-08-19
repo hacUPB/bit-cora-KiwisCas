@@ -385,5 +385,9 @@ void ofApp::mouseReleased(int x, int y, int button) {
 Así el código funcionará de manera correcta.
 
 
+# Actividad 7
+
+![alt text](<Capturas/Captura de pantalla 2025-08-19 083631.png>)
+
 
 
