@@ -384,6 +384,80 @@ void ofApp::mouseReleased(int x, int y, int button) {
 ```
 Así el código funcionará de manera correcta.
 
+# Actividad 7
 
+## ¿Qué sucede cuando presionas la tecla “c”? (Creado en el stack)
+
+Como está creado en el stack, cuando se presiona la letra `c` se crea un objeto tipo `Sphere` como una variable local de la función `createObjectInStack()`.
+
+Luego de eso, se guarda la dirección de memoria de esa variable **local** (`&localSphere`) en el  `globalBector`.
+
+El problema con este código es cuando la función que es llamada en el stack, es decir, `localSphere`sale del ámbito y su espacio en el *stack* se invalida. El puntero en `globalVector`sigue apuntando a esa dirección, pero esa dirección ya no contiene un `Sphere` válido entonces, cuando `draw()` intenta usar ese puntero, el comportamiento se vuelve indefinido, a veces el programa puede mostrar valores basura e incluso puede funcionar pero solo es mera coincidencia.
+
+## ¿Qué sucede cuando presionas la tecla “c”? (Creado en el heap)
+
+Acá se usa `new Sphere()`, lo que reserva memoria en el *heap* lo que hace que el objeto persista más allá del fin de la función, puesto que la memoria del heap no se libera automáticamente cuando termina `createObjectInStack()`.
+
+Así el puntero en `globalVector` sí apunta a un objeto válido lo que permite que se dibuje sin algún tipo de problema pero bajo la responsabilidad de que esa memoria en algún punto debe de ser liberada ya que de lo contrario puede generar fugas de memoria.
+
+## ¿Por qué ocurre esto?
+
+La raíz del problema del ejercicio reside en la **duración del almacenamiento** que se maneja en el lenguaje de programación.
+
+1. **Stack (Automático):** El tiempo de vida de una variable local dura hasta que termina la función. Fuera de la función, ese espacio se puede reutilizar para cualquier otra cosa puesto que fuera de la fucnión no va a haber nada.
+
+2. **Heap(Dinámico):** Los objetos creados con `new` persisten hasya que de forma explícita se llame a `delete`.
+
+3. **Global (Estático):** Estos existen durante toda la ejecución del programa, incluso antes del `main()`.
+
+La versión original falla puesto que con `localSphere`se confía en que el objeto local seguirávivo después de que la función retorne.
+
+
+# Actividad 8
+
+## ¿Cuándo debo crear objetos en el `heap` y cuándo en memoria global?
+
+- **Heap**
+    - Se crean con `new` y se liberan con `delete`.
+    - Son útiles cuando los objetos deben de **vivir más allá del alcance de una función**, o cuando la cantidad de objetos es variable, por ejemplo partículas, enemigos en juegos, etc.
+    - Ventaja: Son muy flexibles.
+    - Desventaja: Riegos de flitración de memoria si no se libera.
+
+- **Global**
+    - Se declaran fuera de cualquier clase o función.
+    - Viven **todo el progrema** y son accesibles desde cualquier parte.
+    - Son útiles para recursos únicos (ej: Configuraciones generales, cámaras, etc.)
+    - Ventaja: Siempre están disponibles.
+    - Desventaja: Pueden generar **acoplamiento excesivo** y dificultar el mantenimiento.
+
+**Heap** dinámicos y cambiantes y **Global** solo datos únicos que deben persistir toda la ejecución.
+
+# Actividad 9
+
+## ¿Qué sucede cuando presionas la tecla “f”?
+
+- Se elimuna el **último punto agregado** (a modo de un comportamiento de pila, es decir un comportamiento LIFO, *Last In First Out* el último en entrar es el primero en salir) y visualmente desaparece el círculo agregado más reciente.
+
+- En la memoria se libera el `ofVec2f` que estaba en el heap y luego se quita su puntero del vector.
+
+## Análisis de la siguiente parte del código
+
+```cpp
+if(!heapObjects.empty()) {
+    delete heapObjects.back();
+    heapObjects.pop_back();
+}
+```
+
+1. `if(!heapObjects.empty())` 
+    Este evita operar si el contenedor está vacío. sin realizar ese chequeo, acceder a `back()` sería un comportamiento indefinido.
+
+2. `delete heapObjects.back();`
+    - Llama al destructor de `ofVec2f` y libera la memoria del objeto creado con `new` en `mousePressed`
+    - **Nota**: tras `delete`, el puntero queda colgante (dangling) mientras siga dentro del `vector` ya que aún no se ha retirado del contenedor.
+
+3. `heapObjects.pop_back();`
+    - Elimina del `vector` la copia del puntero que apuntaba al objeto ya liberado.
+    - Hecho esto, el contenedor ya no conserva ningún puntero colgante.
 
 
