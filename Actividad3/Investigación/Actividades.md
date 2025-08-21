@@ -412,6 +412,10 @@ La raíz del problema del ejercicio reside en la **duración del almacenamiento*
 
 La versión original falla puesto que con `localSphere`se confía en que el objeto local seguirávivo después de que la función retorne.
 
+# Actividad 7
+
+![alt text](<Capturas/Captura de pantalla 2025-08-19 083631.png>)
+
 
 # Actividad 8
 
