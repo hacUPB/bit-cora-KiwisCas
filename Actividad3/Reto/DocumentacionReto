@@ -1,0 +1,69 @@
+# Informe sobre manejo de memoria en la aplicación
+
+El manejo de memoria sigue el modelo clásico que tiende a usarse en OpenFrameworks y en C++ es decir:
+
+- Stack (pila): se almacena la memoria automática de variables locales.
+
+- Heap (montón): se almacenan estructuras dinámicas y objetos que pueden crecer en tamaño en tiempo de ejecución.
+
+- Segmento de datos estáticos: contiene variables globales y estáticas que viven durante toda la ejecución.
+
+
+## 1. Variables locales (Stack)
+
+Las funciones como `setup()`, `draw()`, `mousePressed()` y `generateSpheres()` declaran variables locales `(x, y, z, t, etc.)`.
+Estas se crean temporalmente en el stack y desaparecen al salir del alcance de la función.
+Ejemplo:
+```cpp
+float z = cos(ofDist(x, y, 0, 0) / distDiv) * amplitud;
+```
+
+acá `z` vive solo mientras dure la iteración del bucle en `generateSpheres()`.
+
+## 2. Variables miembro de la clase ofApp (Heap implícito al instanciar la app)
+
+Cuando el framework crea la clase `ofApp`, las variables miembro se almacenan en memoria durante toda la vida de la aplicación.
+Estas variables se ubican en el heap porque el objeto principal `(ofApp)` se instancia de manera dinámica dentro del motor de openFrameworks.
+
+`sphereMesh` → contiene la geometría base de la esfera (malla) y se mantiene en memoria.
+
+`instanceMatrices` → vector dinámico de matrices de transformación `(glm::mat4)`, en el heap.
+
+`instanceColors` → vector dinámico de colores `(ofFloatColor)`, también en el heap.
+
+`spherePositions` → vector dinámico con las posiciones `(glm::vec3)` de todas las esferas.
+
+`cam` → objeto `ofEasyCam`, que gestiona la cámara.
+
+Variables escalares (`xStep`, `yStep`, `distDiv`, `amplitud`, `gridWidth`, `gridHeight`) se guardan dentro del objeto ofApp y permanecen mientras viva este objeto.
+
+## 3. Vectores dinámicos `(std::vector)` `(Heap)`
+
+Los contenedores `spherePositions`, `instanceMatrices` e `instanceColors` utilizan memoria dinámica.
+Cada vez que se llama a `generateSpheres(), se limpia el contenido anterior y se vuelve a reservar memoria en el heap para almacenar los nuevos datos.
+
+Por ejemplo:
+```cpp
+spherePositions.clear();
+
+instanceMatrices.clear();
+
+instanceColors.clear();
+```
+
+
+Esto libera la memoria anterior (aunque no siempre reduce la capacidad reservada, depende de la implementación de `std::vector`) y permite reconstruir las estructuras con el nuevo tamaño.
+
+## 4. Recursos gráficos (GPU + CPU)
+
+`ofVboMesh sphereMesh`: aunque su objeto está en la RAM, internamente también reserva memoria en la GPU (VRAM) para manejar el dibujado instanciado de las esferas.
+
+`ofSetColor()` y el buffer de colores trabajan en la CPU, pero al llamar `sphereMesh.drawInstanced()`, los datos se envían a la GPU, donde ocurre el renderizado.
+
+## 5. Selección de esferas
+
+En `mousePressed()`, al calcular rayos e intersecciones, se usan variables locales en stack (`rayStart`, `rayEnd`, `intersectionPoint`), mientras que la posición seleccionada (`selectedSpherePos`) se guarda en la memoria miembro del objeto `ofApp` (`heap`), ya que debe persistir más allá del clic.
+
+## 6. Video Programa
+
+<video controls src="Video/Grabación de pantalla 2025-08-28 085906.mp4" title="Title"></video>
