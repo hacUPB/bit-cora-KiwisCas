@@ -28,10 +28,13 @@ El usuario interactúa con la obra de arte digital de varias maneras:
 **Prueba realizada:**  
 1. Se movió el mouse a distintas posiciones, observando cómo las partículas seguían la posición del attractor.  
 2. Se agregaron y eliminaron partículas, comprobando el cambio en los contadores y en la visualización.  
-3. Se recuperaron partículas desde la pila y volvieron a moverse en la escena.  
+3. Se recuperaron partículas desde la pila y volvieron a moverse en la escena.
+
+
 
 **Evidencia:**
-En caso de que el video no se observe, revisar en la carpeta de [VideosYFotos](C:\Users\thoma\Documents\GitHub\bit-cora-KiwisCas\Actividad4\Reto\VideosYFotos)  
+En caso de que el video no se observe, revisar en la carpeta de ![VideosYFotos](https://github.com/hacUPB/bit-cora-KiwisCas/blob/main/Actividad4/Reto/VideosYFotos/Requisito2Video.mp4) 
+
 <video controls src="VideosYFotos/Requisito2Video.mp4" title="Requisito2Video"></video>
 ---
 
@@ -51,6 +54,7 @@ Cada partícula se crea dinámicamente con `new`. Para evitar fugas de memoria:
 
 **Evidencia:**  
 ![Capturas de Diagnostico](<VideosYFotos/Captura de pantalla 2025-09-16 105128.png>)
+
 *En la captura se observan los snapshots tomados durante la ejecución. Se aprecia el incremento al agregar, estabilidad al eliminar y recuperar, y ausencia de fugas permanentes.*
 ---
 
