@@ -1,4 +1,4 @@
-## **Actividad 2 – Pilas y Colas en Arte Generativo**
+## **Actividad 2 **
 
 ---
 
