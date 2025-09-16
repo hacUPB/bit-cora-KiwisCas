@@ -30,8 +30,9 @@ El usuario interactúa con la obra de arte digital de varias maneras:
 2. Se agregaron y eliminaron partículas, comprobando el cambio en los contadores y en la visualización.  
 3. Se recuperaron partículas desde la pila y volvieron a moverse en la escena.  
 
-**Evidencia:**  
-<video controls src="VideosYFotos/Grabación de pantalla 2025-09-16 111301.mp4" title="Title"></video>
+**Evidencia:**
+En caso de que el video no se observe, revisar en la carpeta de [VideosYFotos](C:\Users\thoma\Documents\GitHub\bit-cora-KiwisCas\Actividad4\Reto\VideosYFotos)  
+<video controls src="VideosYFotos/Requisito2Video.mp4" title="Requisito2Video"></video>
 ---
 
 ### Requisito 3: Gestión de memoria
