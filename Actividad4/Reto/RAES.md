@@ -31,7 +31,7 @@ El usuario interactúa con la obra de arte digital de varias maneras:
 3. Se recuperaron partículas desde la pila y volvieron a moverse en la escena.  
 
 **Evidencia:**  
-<video controls src="VideosYFotos/Grabación de pantalla 2025-09-16 101848.mp4" title="Title"></video>
+<video controls src="VideosYFotos/Grabación de pantalla 2025-09-16 111301.mp4" title="Title"></video>
 ---
 
 ### Requisito 3: Gestión de memoria
