@@ -51,6 +51,7 @@ Cada partícula se crea dinámicamente con `new`. Para evitar fugas de memoria:
 
 **Evidencia:**  
 ![Capturas de Diagnostico](<VideosYFotos/Captura de pantalla 2025-09-16 105128.png>)
+
 *En la captura se observan los snapshots tomados durante la ejecución. Se aprecia el incremento al agregar, estabilidad al eliminar y recuperar, y ausencia de fugas permanentes.*
 ---
 
