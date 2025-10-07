@@ -69,87 +69,56 @@ Cuando llega un evento (por ejemplo, `"attract"`), la partícula cambia de estad
 
 ## 4. Cambios realizados y experimentos
 
-### 4.1 Nuevo tipo de partícula: **comet**
+### 4.1 Nuevo tipo de partícula: **galaxy**
 
 Agregué un tipo de partícula más en la fábrica:
 
 ```cpp
-else if (type == "comet") {
-    particle->size = ofRandom(3, 6);
-    particle->color = ofColor(255, 200, 0);
-    particle->velocity *= 6;
+else if (type == "galaxy"){
+	particle->size = ofRandom(8, 12);
+	particle->color = ofColor(255, 0, 255);
 }
 ```
 
-Resultado: los cometas son más rápidos y de color amarillo/naranja, se ven muy bien cuando se mueven por la pantalla.
+Resultado: se crean Galaxias, las cuales son las más grandes y son de color entre rosado y morado.
 
-### 4.2 Nuevo estado: **OrbitState**
+### 4.2 Nuevo estado: **RandomState**
 
 Agregué un estado para que las partículas orbiten alrededor del mouse:
 
 ```cpp
-class OrbitState : public State {
-public:
-    void update(Particle* p) override {
-        ofVec2f center(((ofApp*)ofGetAppPtr())->mouseX, ((ofApp*)ofGetAppPtr())->mouseY);
-        ofVec2f dir = p->position - center;
-        float angle = atan2(dir.y, dir.x);
-        angle += 0.08f;
-        float r = dir.length();
-        p->position = center + ofVec2f(cos(angle), sin(angle)) * r;
-    }
-};
+void RandomState::update(Particle* particle) {
+	ofVec2f randomTarget(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()));
+
+	ofVec2f direction = randomTarget - particle->position;
+	direction.normalize();
+
+	particle->velocity += direction * 0.05;
+	ofClamp(particle->velocity.x, -3, 3);
+	ofClamp(particle->velocity.y, -3, 3);
+
+	particle->position += particle->velocity * 0.2;
+}
 ```
 
 Evento:
 
 ```cpp
-else if (event == "orbit") {
-    setState(new OrbitState());
+else if (event == "random") {
+		setState(new RandomState());
 }
 ```
 
 Y en `keyPressed`:
 
 ```cpp
-else if (key == 'o') {
-    notify("orbit");
+else if (key == 'g') {
+		notify("random");
 }
 ```
 
-Resultado: las partículas giran alrededor del mouse cuando se presiona la tecla `o`.
+Resultado: las partículas giran de forma aleatoria cuando se presiona la tecla `g`.
 
-### 4.3 Nuevo estado: **ExplodeState**
-
-Hice un estado para que las partículas exploten desde el mouse:
-
-```cpp
-class ExplodeState : public State {
-public:
-    void onEnter(Particle* p) override {
-        ofVec2f center(((ofApp*)ofGetAppPtr())->mouseX, ((ofApp*)ofGetAppPtr())->mouseY);
-        ofVec2f dir = p->position - center;
-        dir.normalize();
-        p->velocity = dir * ofRandom(3, 6);
-        p->color = ofColor::fromHsb(ofRandom(255), 200, 255);
-    }
-    void update(Particle* p) override {
-        p->position += p->velocity;
-        p->velocity *= 0.98f;
-    }
-};
-```
-
-Evento y tecla:
-
-```cpp
-else if (event == "explode") {
-    setState(new ExplodeState());
-}
-// tecla e
-```
-
-Resultado: las partículas salen disparadas y cambian de color, se ve como una explosión.
 
 ---
 
@@ -158,8 +127,7 @@ Resultado: las partículas salen disparadas y cambian de color, se ve como una e
 * Al presionar **A**, las partículas se acercan al mouse.
 * Al presionar **R**, se alejan.
 * Al presionar **S**, se detienen.
-* Al presionar **O**, orbitan.
-* Al presionar **E**, explotan.
+* Al presionar **G**, se mueven al azar.
 
 Los cambios funcionaron bien y ayudaron a entender cómo cada patrón trabaja en conjunto.
 
@@ -175,13 +143,3 @@ Aprendí que los patrones de diseño ayudan a que el código sea más ordenado, 
 
 ---
 
-## 7. Ideas para mejorar
-
-* Usar punteros inteligentes (`unique_ptr`) para no tener que borrar manualmente los objetos.
-* Crear más estados con comportamientos raros (por ejemplo, que sigan trayectorias curvas o cambien de color lentamente).
-* Agregar una interfaz con botones en vez de usar solo teclas.
-* Mostrar texto en pantalla con el estado actual o el número de partículas.
-
----
-
-**Fin de la bitácora**
