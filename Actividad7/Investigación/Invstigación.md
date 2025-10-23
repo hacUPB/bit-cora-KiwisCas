@@ -51,11 +51,12 @@ Se usa para guardar la profundidad (la distancia a la cámara) de cada píxel. S
 
 # Actividad 2
 
+
+## Ejemplo 1
+
 - ¿Cómo funciona?
 
 ofApp::setup() carga el shader correcto (GL3 si el renderer programable está activo; si no, carga GL2). En draw() se llama shader.begin(), se dibuja un rectángulo que cubre la ventana y se llama shader.end(). El efecto visual lo genera el fragment shader (colores en función de gl_FragCoord). 
-
-ofApp
 
 - ¿Qué resultados obtuviste?
 
@@ -163,3 +164,44 @@ Explicación
 - `outputColor = vec4(r, g, b, a);`
 
     - Salida final del color.
+
+---
+
+
+![alt text](image.png)
+
+
+- ¿Cómo funciona?
+
+    En setup cargas el shader (GL3) y creas un plano mallado (grid).
+
+    En draw:
+
+    - Calculas el centro de pantalla y trasladas la escena allí.
+
+    - A partir de la posición del ratón mezclas entre magenta y azul (según mouseX) y pasas ese color al shader como uniform mouseColor.
+
+    - Comienzas el shader y dibujas el plano en modo alámbrico (wireframe).
+
+- ¿Qué resultados obtuviste?
+
+Se ve una malla (solo líneas) centrada en pantalla.
+Todo el dibujo toma un color uniforme que cambia de magenta a azul cuando mueves el ratón de izquierda a derecha.
+No hay iluminación ni texturas; el color lo define directamente el shader a partir del uniform.
+
+- ¿Estás usando un vertex shader?
+
+Sí. Cargas un programa con shader.vert + shader.frag. El VS suele transformar la posición de cada vértice (MVP) y dejar listo el dibujo. En tu app no se ve que el VS añada efectos extra.
+
+- ¿Estás usando un fragment shader?
+
+Sí. Es el archivo activo (shader.frag) y decide el color final de cada fragmento (píxel).
+
+- Analiza el código de los shaders. ¿Qué hace cada uno?
+
+Fragment shader (shader.frag):
+OF_GLSL_SHADER_HEADER: inserta la cabecera correcta de GLSL según tu contexto.
+out vec4 outputColor: salida del color del fragmento.
+uniform vec4 mouseColor: color que le pasas desde C++.
+main: simplemente asigna outputColor = mouseColor; es decir, pinta todo con ese color uniforme.
+Nota: Aunque en C++ pasas mousePos y mouseRange, aquí no se usan.
