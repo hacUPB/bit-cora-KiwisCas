@@ -168,7 +168,7 @@ Explicación
 ---
 ## Ejemplo 2
 
-![alt text](image.png)
+![alt text](Imagenes/2.png)
 
 
 - ¿Cómo funciona?
@@ -216,7 +216,7 @@ El programa dibuja una cuadricula que resalta con una especie de circulo o esfer
 
 - ¿Qué resultados obtuviste?
 
-![alt text](<Captura de pantalla 2025-10-28 072538.png>)
+![alt text](Imagenes/3.png)
 
 - ¿Estás usando un vertex shader?
 
@@ -229,7 +229,7 @@ Este es el que se encarga del color dependiendo de la posición del mouse.
 - Analiza el código de los shaders. ¿Qué hace cada uno?
 
 
-### SHADER.VERT
+### shader.vert
 
 Como se dijo anteriormente, este es el shader que se encarga de deformar el plano usando el cursor. Solo hace eso
 
@@ -276,7 +276,7 @@ void main()
 	gl_Position = modelViewProjectionMatrix * pos;
 }
 ```
-### SHADER.FRAG
+### shader.frag
 
 Este se encarga del color que se ve en la pantalla dependiendo de la posición del mouse, osea, genera un cambio de color que se ve en la pantalla cuando movemos el mouse de un lado a otro o de arriba hacia abajo.
 
@@ -288,7 +288,7 @@ Un uniform es una variable que le manda información al shader desde el programa
 
 ## Ejemplo 4
 
-![alt text](<Captura de pantalla 2025-10-28 072806.png>)
+![alt text](Imagenes/4.png)
 
 ### ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican estos?
 el programa principal crea una imagen y un plano para mostrarla, y usa un shader para cambiar cómo se ve. El vertex shader se encarga de mover los puntos (vértices) del plano y también de cambiar las coordenadas de la textura usando la posición del mouse. Luego, le pasa esa información al fragment shader, que se encarga de pintar cada píxel de la imagen en pantalla usando esas coordenadas.
@@ -296,7 +296,7 @@ el programa principal crea una imagen y un plano para mostrarla, y usa un shader
 Estos se comunican por medio de uniforms, que sirven para enviar datos, como la posición del mouse o el tamaño de la pantalla, al shader. Así, cuando movemos el mouse, el shader recibe ese valor y hace que la textura se desplace, creando un efecto visual en tiempo real. En el caso de este ejemplo es una imagen grande que se puede ver sisigo moviendo el mouse
 
 ## modificación
-![alt text](<Captura de pantalla 2025-10-28 073137.png>)
+![alt text](Imagenes/5.png)
 
 Modifique el `shader.frag` y el `shader.vert`
 
@@ -351,15 +351,14 @@ void main() {
 
 ## Ejemplo 5
 
-![alt text](<Captura de pantalla 2025-10-28 073610.png>)
-
+![alt text](Imagenes/6.png)
 ### ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican estos?
 
 Funciona igual que el anterior ejemplo, solo que  esta vez se usa un uniform demas para decirle al programa que use la mask para darle efecto a la imagen.
 
 ### Modificación
 
-![alt text](<Captura de pantalla 2025-10-28 073827.png>)
+![alt text](Imagenes/7.png)
 
 ```cpp
 OF_GLSL_SHADER_HEADER
@@ -398,7 +397,7 @@ void main()
 
 ## Ejemplo 6
 
-![alt text](<Captura de pantalla 2025-10-28 074031.png>)
+![alt text](Imagenes/8.png)
 
 ### ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican estos?
 
@@ -406,7 +405,7 @@ El código hace que la aplicación use tres imágenes o videos (una de la cámar
 
 ### Modificación
 
-![alt text](<Captura de pantalla 2025-10-28 074432.png>)
+![alt text](Imagenes/9.png)
 
 ```cpp
 OF_GLSL_SHADER_HEADER
