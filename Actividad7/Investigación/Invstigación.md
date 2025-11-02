@@ -295,7 +295,7 @@ el programa principal crea una imagen y un plano para mostrarla, y usa un shader
 
 Estos se comunican por medio de uniforms, que sirven para enviar datos, como la posición del mouse o el tamaño de la pantalla, al shader. Así, cuando movemos el mouse, el shader recibe ese valor y hace que la textura se desplace, creando un efecto visual en tiempo real. En el caso de este ejemplo es una imagen grande que se puede ver sisigo moviendo el mouse
 
-## modificación
+## Modificación
 ![alt text](Imagenes/5.png)
 
 Modifique el `shader.frag` y el `shader.vert`
@@ -456,4 +456,330 @@ y agregué esto último antes de inicializar en `Draw()` a `maskFbo`
 
 ```cpp
 shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+```
+
+# Actividad 4
+
+## Ejemplo 7
+
+![alt text](Imagenes/10.png)
+
+### ¿Qué hace el código del ejemplo?
+
+El código crea una aplicación interactiva de pintura digital en OpenFrameworks que permite al usuario dibujar con un pincel sobre una máscara y aplicar efectos visuales mediante shaders.
+
+**Funcionalidades principales:**
+
+Permite dibujar o borrar con un pincel (brush.png) sobre una superficie (FBO).
+
+Genera las letras “O” y “F” a partir de una fuente (Batang.ttf), que se dibujan de manera animada siguiendo trayectorias predefinidas.
+
+Combina diferentes texturas o colores en función del nivel de gris de la máscara.
+
+El usuario puede:
+
+- Cambiar el tamaño y la opacidad del pincel.
+
+- Alternar entre modo pincel y borrador.
+
+- Activar o desactivar el uso de texturas.
+
+- Limpiar la pantalla con la barra espaciadora.
+
+
+### ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican estos?
+
+**Flujo general:**
+
+1. ofApp.cpp (CPU):
+
+- Carga imágenes (tex0.jpg a tex4.jpg) y el pincel.
+
+- Crea un FBO (maskFbo) donde se guarda la máscara pintada.
+
+- Calcula los trazos de las letras O y F y mueve el pincel siguiendo esas trayectorias.
+
+- Envía al shader todas las texturas y parámetros mediante shader.setUniform...().
+
+2. Vertex Shader (GPU – Etapa 1)
+
+- Recibe posiciones (position) y coordenadas de textura (texcoord).
+
+- Calcula la posición final de cada vértice multiplicando por la modelViewProjectionMatrix.
+
+- Pasa las coordenadas de textura al fragment shader.
+
+3. Fragment Shader (GPU – Etapa 2)
+
+- Recibe la máscara (maskTex) y las texturas.
+
+- Usa el valor de gris del píxel de la máscara para decidir qué textura o color mostrar.
+
+- Mezcla dos texturas o colores usando mix(back, fore, mixAmnt) para lograr transiciones suaves.
+
+- Devuelve el color final al framebuffer de OpenGL.
+
+### Comunicación entre CPU y GPU:
+
+- ofApp envía uniforms al shader:
+
+- maskTex: textura de la máscara.
+
+- tex0–tex4: texturas de muestra.
+
+- uUseTextures: indica si se usan texturas o solo colores.
+
+- uMaskSize y uTexSize: tamaños de texturas.
+
+Los shaders procesan esos datos en la GPU para componer la imagen final.
+
+### Cambios del shader.vert
+
+En `offApp::draw()` agregué lo siguiente
+
+```cpp
+shader.begin();
+
+shader.setUniform1f("uTime", ofGetElapsedTimef());
+
+```
+
+Y en `shader.vert` agregué lo siguiente:
+
+```cpp
+OF_GLSL_SHADER_HEADER
+
+// matrices y atributos del pipeline
+uniform mat4 modelViewProjectionMatrix;
+uniform float uTime; // Recibe el tiempo desde ofApp
+
+in vec4 position;
+in vec2 texcoord;
+
+out vec2 texCoordVarying;
+
+void main() {
+    vec4 pos = position;
+
+    // Aplicar una onda senoidal a los vértices
+    pos.z += sin(pos.x * 0.05 + uTime * 2.0) * 20.0;
+    pos.y += cos(pos.x * 0.03 + uTime) * 10.0;
+
+    texCoordVarying = texcoord;
+    gl_Position = modelViewProjectionMatrix * pos;
+}
+```
+
+El resultado fue el siguiente:
+
+<video controls src="Imagenes/Grabación de pantalla 2025-10-30 074956.mp4" title="Title"></video>
+
+### Cambios del shader.frag
+
+Hice el siguiente cambio 
+
+```cpp
+OF_GLSL_SHADER_HEADER
+
+uniform float uUseTextures;
+uniform vec2 uMaskSize;
+uniform vec2 uTexSize;
+uniform sampler2D maskTex;
+
+uniform float uTime; 
+
+// Texturas (si están activadas)
+uniform sampler2D tex0;
+uniform sampler2D tex1;
+uniform sampler2D tex2;
+uniform sampler2D tex3;
+uniform sampler2D tex4;
+
+in vec2 texCoordVarying;
+out vec4 outputColor;
+
+void main() {
+    float mask = texture(maskTex, texCoordVarying).r;
+
+
+    vec3 rainbow = vec3(
+        0.5 + 0.5 * sin(uTime + texCoordVarying.x * 5.0),
+        0.5 + 0.5 * sin(uTime + texCoordVarying.y * 5.0 + 2.0),
+        0.5 + 0.5 * sin(uTime + 4.0)
+    );
+
+    // Combina el arcoíris con la máscara pintada
+    outputColor = vec4(rainbow, mask);
+}
+```
+
+## Ejemplo 8 
+
+![alt text](Imagenes/11.png)
+
+### ¿Qué hace el código del ejemplo?
+
+El código crea una superficie 3D deformable en OpenFrameworks que simula el movimiento de olas animadas mediante el uso de ruido de Perlin. Este ruido se genera en la CPU como una textura dinámica en escala de grises, que luego es enviada al shader para desplazar los vértices del plano de acuerdo con los valores de brillo de esa textura.
+
+**Funcionalidades principales:**
+
+- Genera una textura dinámica usando ofNoise(), que cambia con el tiempo simulando movimiento.
+
+- Crea un plano 3D subdividido en vértices, los cuales se elevan o descienden según el valor del ruido.
+
+- Usa shaders (vertex y fragment) para aplicar el desplazamiento y el color del plano directamente en la GPU.
+
+**Permite al usuario:**
+
+- Mover el mouse en X para cambiar la escala del ruido (el nivel de detalle del movimiento).
+
+- Mover el mouse en Y para rotar el plano y visualizar las deformaciones desde diferentes ángulos.
+
+- Renderiza la textura de ruido en una esquina de la pantalla para visualizar su patrón base.
+
+
+### ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican estos?
+
+**Flujo general:**
+
+**ofApp.cpp (CPU):**
+
+1. setup():
+
+- Desactiva las texturas ARB para usar coordenadas UV normalizadas (ofDisableArbTex()).
+
+- Carga el shader adecuado según la versión de OpenGL (shadersGL2 o shadersGL3).
+
+- Crea una textura de 120×90 píxeles en escala de grises (img.allocate()).
+
+- Define un plano 3D de 800×600 unidades, subdividido en 200×150 vértices.
+
+- Asocia la textura del ruido con las coordenadas UV del plano.
+
+2. update():
+
+- Genera una textura de ruido en tiempo real usando ofNoise(x * noiseScale, y * noiseScale, time).
+
+- El parámetro noiseScale depende de la posición del mouse en X.
+
+- El tiempo (ofGetElapsedTimef()) se usa como tercera dimensión del ruido, creando movimiento constante.
+
+- Los valores del ruido (0–1) se almacenan como brillo (0–255) en la textura img, que se actualiza en cada frame.
+
+3. draw():
+
+- Activa la textura (img.getTexture().bind()).
+
+- Inicia el shader (shader.begin()).
+
+- Centra el plano en pantalla y lo rota según la posición del mouse en Y.
+
+- Dibuja el plano con la deformación y el color aplicados por el shader.
+
+- Desactiva el shader (shader.end()).
+
+- Muestra la textura de ruido en una esquina para referencia.
+
+4. Vertex Shader (GPU – Etapa 1)
+
+- Recibe los vértices (position) y coordenadas de textura (texcoord) del plano.
+
+- Lee el valor de brillo del píxel correspondiente en la textura (texture(tex0, texcoord).r).
+
+- Usa ese valor como desplazamiento vertical, multiplicado por una escala (h * 80.0).
+
+- Calcula la posición final del vértice con la matriz de transformación (modelViewProjectionMatrix).
+
+- Envía las coordenadas de textura al fragment shader para el color posterior.
+
+
+
+5. Fragment Shader (GPU – Etapa 2)
+
+- Recibe las coordenadas de textura (texCoordVarying) y la textura (tex0).
+
+- Obtiene el valor de ruido del píxel (h), que representa la altura.
+
+- Calcula un color mezclando tonos de azul y blanco según ese valor:
+
+- vec3 color = mix(vec3(0.0, 0.3, 0.8), vec3(0.9, 0.9, 1.0), h);
+
+
+- Devuelve el color resultante en outputColor.
+
+
+### Modificaciones
+
+<video controls src="Imagenes/Grabación de pantalla 2025-10-30 091508.mp4" title="Title"></video>
+
+```cpp
+void ofApp::draw(){
+	ofBackground(0);
+	img.getTexture().bind();
+	shader.begin();
+
+	ofPushMatrix();
+	ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+	float percentY = mouseY / (float)ofGetHeight();
+	float rotation = ofMap(percentY, 0, 1, -60, 60, true) + 60;
+	ofRotateDeg(rotation, 1, 0, 0);
+
+	ofSetColor(255);     // Color del plano
+	plane.draw();        // Cambio de wireframe a sólido
+
+	ofPopMatrix();
+
+	shader.end();
+	img.getTexture().unbind();
+
+	// Mostramos la textura como vista previa
+	ofSetColor(255);
+	img.draw(0, 0, 160, 120);
+}
+```
+```cpp
+OF_GLSL_SHADER_HEADER
+
+uniform mat4 modelViewProjectionMatrix;
+in vec4 position;
+in vec2 texcoord;
+uniform sampler2D tex0;
+
+out vec2 texCoordVarying;
+
+void main()
+{
+    vec4 modifiedPosition = position;
+    float scaleY = 100.0;
+    float scaleZ = 50.0;
+
+    // Tomamos dos canales distintos del mapa de ruido
+    float displacementY = texture(tex0, texcoord).r;
+    float displacementZ = texture(tex0, texcoord).g;
+
+    // Movemos en Y y Z
+    modifiedPosition.y += displacementY * scaleY;
+    modifiedPosition.z += displacementZ * scaleZ;
+
+    gl_Position = modelViewProjectionMatrix * modifiedPosition;
+    texCoordVarying = texcoord;
+}
+
+```
+
+```cpp
+OF_GLSL_SHADER_HEADER
+
+uniform sampler2D tex0;
+in vec2 texCoordVarying;
+out vec4 outputColor;
+
+void main()
+{
+    float val = texture(tex0, texCoordVarying).r;
+    // Mapear ruido a un degradado azul-rosado
+    vec3 color = mix(vec3(0.1, 0.2, 0.8), vec3(1.0, 0.3, 0.6), val);
+    outputColor = vec4(color, 1.0);
+}
+
 ```
