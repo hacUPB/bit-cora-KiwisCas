@@ -783,3 +783,376 @@ void main()
 }
 
 ```
+## Ejemplo 9
+
+![alt text](Imagenes/12.png)
+
+### 1. ¿Qué hace el código del ejemplo?
+
+El código implementa un **efecto de desenfoque gaussiano (blur)** en dos pasos sobre una imagen, utilizando **shaders** dentro de **OpenFrameworks**.
+
+- El primer shader (`shaderBlurX`) aplica un desenfoque **horizontal**.
+- El segundo shader (`shaderBlurY`) aplica un desenfoque **vertical**.
+- La intensidad del desenfoque depende de la posición del **mouse en el eje X**.
+
+El programa toma una imagen (`img.jpg`), la procesa con dos shaders en diferentes direcciones y muestra un resultado final suavizado. El usuario puede controlar la fuerza del desenfoque moviendo el mouse horizontalmente.
+
+---
+
+### 2. ¿Cómo funciona el código de aplicación, los shaders y cómo se comunican?
+
+#### En `ofApp.cpp`:
+
+- **setup()**
+  - Desactiva el uso de coordenadas arbitrarias (`ofDisableArbTex()`).
+  - Carga los shaders (`shaderBlurX` y `shaderBlurY`).
+  - Carga la imagen.
+  - Crea dos **Frame Buffer Objects (FBOs)** que almacenan los resultados intermedios de cada paso del blur.
+
+- **draw()**
+  1. Calcula la cantidad de desenfoque (`blurAmnt`) según la posición del mouse.
+  2. Dibuja la imagen en un FBO usando el shader `shaderBlurX` (blur horizontal).
+  3. Usa el resultado de ese FBO para aplicar el shader `shaderBlurY` (blur vertical).
+  4. Muestra el resultado final en pantalla.
+
+#### Comunicación entre la aplicación y los shaders
+
+La comunicación se realiza mediante **uniforms**, que son variables enviadas desde la CPU (código C++) al GPU (shaders).
+
+Ejemplo:
+
+```cpp
+shaderBlurX.setUniform1f("blurAmnt", blur);
+shaderBlurX.setUniform1f("texwidth", image.getWidth());
+En el shader, se definen estas variables como:
+
+uniform float blurAmnt;
+uniform float texwidth;
+```
+
+
+El shader usa estos valores para calcular los desplazamientos de los píxeles y así lograr el efecto de desenfoque.
+
+### 3. Modificaciones a ofApp.cpp y al vertex shader para otros comportamientos
+
+```cpp
+#include "ofApp.h"
+
+//--------------------------------------------------------------
+void ofApp::setup(){
+	ofDisableArbTex();
+	if(ofIsGLProgrammableRenderer()){
+		shaderBlurX.load("shadersGL3/shaderBlurX");
+		shaderBlurY.load("shadersGL3/shaderBlurY");
+	}else{
+		shaderBlurX.load("shadersGL2/shaderBlurX");
+		shaderBlurY.load("shadersGL2/shaderBlurY");
+	}
+
+	image.load("img.jpg");
+	
+	fboBlurOnePass.allocate(image.getWidth(), image.getHeight());
+	fboBlurTwoPass.allocate(image.getWidth(), image.getHeight());
+	
+	// Nueva variable para el tiempo (para animar la distorsión)
+	time = 0.0f;
+}
+
+//--------------------------------------------------------------
+void ofApp::update(){
+	// Actualizar el tiempo para la animación (incrementa suavemente)
+	time += 0.01f;  // Ajusta la velocidad de la onda cambiando este valor
+}
+
+//--------------------------------------------------------------
+void ofApp::draw(){
+	
+	float blur = ofMap(mouseX, 0, ofGetWidth(), 0, 4, true);
+	
+	//----------------------------------------------------------
+	fboBlurOnePass.begin();
+	
+	shaderBlurX.begin();
+	shaderBlurX.setUniform1f("blurAmnt", blur);
+	shaderBlurX.setUniform1f("texwidth", image.getWidth());
+	// Pasar el tiempo al shader para la distorsión
+	shaderBlurX.setUniform1f("time", time);
+
+	image.draw(0, 0);
+	
+	shaderBlurX.end();
+	
+	fboBlurOnePass.end();
+	
+	//----------------------------------------------------------
+	fboBlurTwoPass.begin();
+	
+	shaderBlurY.begin();
+	shaderBlurY.setUniform1f("blurAmnt", blur);
+	shaderBlurY.setUniform1f("texheight", image.getHeight());
+	// Pasar el tiempo al shader para la distorsión
+	shaderBlurY.setUniform1f("time", time);
+	
+	fboBlurOnePass.draw(0, 0);
+	
+	shaderBlurY.end();
+	
+	fboBlurTwoPass.end();
+	
+	//----------------------------------------------------------
+	ofSetColor(ofColor::white);
+	fboBlurTwoPass.draw(0, 0);
+}
+```
+
+Modificaciones al .vert
+
+```cpp
+OF_GLSL_SHADER_HEADER
+
+// these are for the programmable pipeline system
+uniform mat4 modelViewProjectionMatrix;
+uniform mat4 textureMatrix;
+
+in vec4 position;
+in vec2 texcoord;
+in vec4 normal;
+in vec4 color;
+
+// Nueva uniform para el tiempo (para animar la distorsión)
+uniform float time;
+
+out vec2 texCoordVarying;
+
+void main()
+{
+    #ifdef INTEL_CARD
+    color = vec4(1.0); // for intel HD cards
+    normal = vec4(1.0); // for intel HD cards
+    #endif
+
+    // Copiar la posición original
+    vec4 pos = position;
+    
+    // Aplicar distorsión ondulatoria: desplazar en X basado en Y y tiempo
+    // Esto crea ondas verticales que se mueven horizontalmente
+    float wave = sin(texcoord.y * 10.0 + time * 5.0) * 0.1;  // Ajusta amplitud y frecuencia
+    pos.x += wave * position.x;  // Escalar el desplazamiento por la posición X para un efecto más pronunciado en los bordes
+    
+    texCoordVarying = texcoord;
+	gl_Position = modelViewProjectionMatrix * pos;
+}
+```
+
+Resultado
+
+![alt text](Imagenes/13.png)
+
+4. Modificaciones al fragment shader para otros comportamientos
+
+Para este último simplemente agregué esta linea:
+
+```cpp
+outputColor = vec4(1.0, 0.0, 0.0, 1.0);
+```
+
+El resultado es el siguiente:
+
+![alt text](Imagenes/14.png)
+
+
+# RAE´S
+
+## RAE1 — Evidencias y explicación
+
+### 1. Construcción de la aplicación
+
+La aplicación está desarrollada con openFrameworks. Se crean tres elementos principales:
+
+* **Generación de textura procedimental:** en `ofApp::update()` genero una imagen (`ofImage`) en escala de grises usando ruido (ofNoise). La textura se actualiza cada fotograma según la posición del ratón (`mouseX`) y el tiempo, logrando patrones orgánicos en movimiento.
+
+* **Plano 3D:** un `ofPlanePrimitive` actúa como malla sobre la que se mapea la textura. Se mapearon las coordenadas de textura con `plane.mapTexCoordsFromTexture(img.getTexture());`.
+
+* **Shaders:** se usan dos shaders:
+
+  * **Vertex shader**: deforma la posición de cada vértice del plano según el valor de la textura en esa coordenada (desplazamiento en Y y Z) y añade una onda senoidal dependiente del tiempo para simular viento.
+  * **Fragment shader**: toma el valor de la textura y lo transforma en un gradiente de color (de azul profundo a amarillo solar), además aplica un brillo pulsante dependiente del tiempo.
+
+Estas piezas se integran en `ofApp::draw()` donde se pasan uniformes (tiempo, resolución) y se renderiza la malla.
+
+### 2. Cómo funciona la aplicación (funcionamiento detallado)
+
+A grandes rasgos el flujo es:
+
+1. `setup()` configura el shader según el renderer disponible y crea la imagen y el plano.
+2. En `update()` se rellena la imagen con valores de ruido. El parámetro `noiseScale` está ligado a `mouseX`, por lo que moviendo el ratón cambian la escala del ruido.
+3. En `draw()` se enlaza la textura al shader; el vertex shader modifica la posición de la malla usando la lectura de la textura (por cada vértice se muestrea el valor de la textura) y el tiempo; el fragment shader colorea según ese mismo valor y aplica un brillo oscilante.
+4. Se dibuja el plano transformado y, como vista previa, se muestra la miniatura de la textura en la esquina.
+
+### 3. Código fuente de la aplicación
+
+```cpp
+// ofApp.cpp (fragmento principal)
+
+#include "ofApp.h"
+
+//--------------------------------------------------------------
+void ofApp::setup() {
+    ofDisableArbTex();
+    if (ofIsGLProgrammableRenderer()) {
+        shader.load("shadersGL3/shader");
+    } else {
+        shader.load("shadersGL2/shader");
+    }
+
+    img.allocate(80, 60, OF_IMAGE_GRAYSCALE);
+
+    plane.set(800, 600, 80, 60);
+    plane.mapTexCoordsFromTexture(img.getTexture());
+}
+
+//--------------------------------------------------------------
+void ofApp::update() {
+    float noiseScale = ofMap(mouseX, 0, ofGetWidth(), 0, 0.1);
+    float noiseVel = ofGetElapsedTimef();
+
+    ofPixels & pixels = img.getPixels();
+    int w = img.getWidth();
+    int h = img.getHeight();
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            int i = y * w + x;
+            float noiseValue = ofNoise(x * noiseScale, y * noiseScale, noiseVel) * 0.5
+                               + ofNoise(x * noiseScale * 2, y * noiseScale * 2, noiseVel) * 0.25
+                               + ofNoise(x * noiseScale * 4, y * noiseScale * 4, noiseVel) * 0.125;
+            pixels[i] = 255 * noiseValue;
+        }
+    }
+    img.update();
+}
+
+//--------------------------------------------------------------
+void ofApp::draw() {
+    ofBackground(0);
+    img.getTexture().bind();
+    shader.begin();
+
+    shader.setUniform1f("time", ofGetElapsedTimef());
+    shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+
+    ofPushMatrix();
+    ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+    float percentY = mouseY / (float)ofGetHeight();
+    float rotation = ofMap(percentY, 0, 1, -60, 60, true) + 60;
+    ofRotateDeg(rotation, 1, 0, 0);
+
+    ofSetColor(255);
+    plane.draw();
+
+    ofPopMatrix();
+
+    shader.end();
+    img.getTexture().unbind();
+
+    ofSetColor(255);
+    img.draw(0, 0, 160, 120);
+}
+```
+
+```cpp
+// fragment shader (shadersGL3/shader.frag)
+
+OF_GLSL_SHADER_HEADER
+
+uniform sampler2D tex0;
+uniform float time;
+uniform vec2 resolution;
+in vec2 texCoordVarying;
+out vec4 outputColor;
+
+void main()
+{
+    float val = texture(tex0, texCoordVarying).r;
+    vec3 deepBlue = vec3(0.0, 0.1, 0.4);
+    vec3 skyBlue = vec3(0.5, 0.8, 1.0);
+    vec3 sunYellow = vec3(1.0, 0.9, 0.3);
+    vec3 color;
+    if (val < 0.5) {
+        color = mix(deepBlue, skyBlue, val * 2.0);
+    } else {
+        color = mix(skyBlue, sunYellow, (val - 0.5) * 2.0);
+    }
+    float brightness = 0.5 + 0.5 * sin(time * 2.0 + texCoordVarying.x * 10.0 + texCoordVarying.y * 10.0);
+    color *= brightness;
+    outputColor = vec4(color, 1.0);
+}
+```
+
+```cpp
+// vertex shader (shadersGL3/shader.vert)
+
+OF_GLSL_SHADER_HEADER
+
+uniform mat4 modelViewProjectionMatrix;
+uniform sampler2D tex0;
+uniform float time;
+in vec4 position;
+in vec2 texcoord;
+
+out vec2 texCoordVarying;
+
+void main()
+{
+    vec4 modifiedPosition = position;
+    float scaleY = 100.0;
+    float scaleZ = 50.0;
+
+    float displacementY = texture(tex0, texcoord).r * scaleY;
+    float wave = sin(texcoord.x * 10.0 + time * 3.0) * 0.5 + 0.5;
+    modifiedPosition.y += displacementY * wave;
+
+    float displacementZ = texture(tex0, texcoord).r * scaleZ * sin(texcoord.y * 5.0 + time * 2.0);
+    modifiedPosition.z += displacementZ;
+
+    gl_Position = modelViewProjectionMatrix * modifiedPosition;
+    texCoordVarying = texcoord;
+}
+```
+
+### 4. Video
+
+<video controls src="Imagenes/Grabación de pantalla 2025-11-02 233146.mp4" title="Title"></video>
+
+## RAE2 — Pruebas y verificación
+
+
+### a) Pruebas de `ofApp.cpp`
+
+1. **Ejecución básica:** compilé y ejecuté el proyecto. Verifiqué que la ventana se abría sin errores y que la textura aparecía en la esquina como miniatura.
+2. **Prueba de ruido:** moví el ratón en el eje X para comprobar que `noiseScale` cambiaba el patrón. Observé que aumentando `mouseX` el ruido se volvía más fino; al reducirlo, las formas se hicieron más grandes y babosas.
+3. **Rendimiento:** corregí el tamaño de la textura (80×60) para mantener un buen rendimiento. Aumentar demasiado la resolución de `img` provocaba caída de frames en mi equipo.
+4. **Errores comunes comprobados:** confirmé que `plane.mapTexCoordsFromTexture()` realmente mapeaba las coordenadas; si no se llamaba, la textura se veía estirada o desplazada.
+
+### b) Pruebas de el vertex shader
+
+1. **Prueba de desplazamiento simple:** primero dejé solo el desplazamiento en Y (comentando la parte Z y la onda) para asegurarme de que el valor de la textura influía en la posición. Observé que las crestas seguían el brillo de la miniatura de ruido.
+2. **Añadí la onda senoidal:** reactivé la onda y verifiqué su velocidad/ amplitud cambiando `time` en `setUniform1f` (simulé valores fijos para debugging). Ajusté los factores `scaleY` y `scaleZ` hasta que la deformación fuera visible pero no excesiva.
+3. **Depuración visual:** para comprobar qué estaba pasando en cada vértice, imprimía (temporalmente) en la consola valores de `ofGetElapsedTimef()` y otras variables; aunque los shaders no imprimen, los cambios observables en pantalla confirmaban su efecto.
+4. **Problemas corregidos:** si la malla se deformaba demasiado, reduje `scaleY` y `scaleZ`. Si la textura parecía no afectar la malla, verifiqué que el binding de la textura (`img.getTexture().bind()`) se hiciera antes de `shader.begin()`.
+
+### c) Pruebas de el fragment shader
+
+1. **Verificación de color básico:** empecé mostrando el valor de `val` como gris (`vec3(val)`), para asegurarme de que el fragment recibía el valor correcto.
+2. **Gradiente:** implementé el `mix` entre colores y observé el resultado. Ajusté los colores para que el rango bajo fuera más oscuro y el alto más cálido.
+3. **Brillo pulsante:** añadí la función `sin(time * 2.0 + ...)` y comprobé que el efecto dependía del tiempo y de la posición; si el parpadeo era muy intenso, reduje la amplitud.
+4. **Correlación con el vertex shader:** confirmé que las zonas elevadas (en el vertex shader) coincidían con cambios de color en el fragment, lo cual produce una percepción de volumen más fuerte.
+
+### d) Pruebas de la aplicación completa
+
+1. **Prueba integrada:** ejecuté la app y observé la sincronía entre deformación y color. Moví el ratón en X e Y para ver cómo cambiaban la escala del ruido y la rotación del plano.
+2. **Grabación:** hice una grabación de pantalla  mostrando distintos comportamientos: ruido lento, ruido rápido, contacto entre rotación y deformación. 
+3. **Chequeos finales:** probé en otro equipo para asegurarme de que no dependiera únicamente de mi hardware.
+
+
+
+
